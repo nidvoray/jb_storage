@@ -38,7 +38,12 @@ namespace jb_storage::utility
 		}
 
 		void Pop()
-		{ _trace.pop_back(); }
+		{
+			if (_trace.empty())
+				throw std::out_of_range{ "popping from empty trace" };
+
+			_trace.pop_back();
+		}
 	};
 
 }
