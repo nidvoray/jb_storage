@@ -7,7 +7,7 @@
 namespace jb_storage::utility
 {
 
-	class Path final // TODO: rename
+	class Path final
 	{
 	public:
 		using const_iterator = std::sregex_token_iterator;
@@ -26,7 +26,7 @@ namespace jb_storage::utility
 		Path GetRest(const const_iterator& it) const	{ return Path{ *this, it }; }
 
 		const_iterator cbegin() const noexcept			{ return _begin; }
-		const_iterator cend() const	noexcept			{ return _end; }
+		const_iterator cend() const noexcept			{ return _end; }
 		const_iterator begin() const noexcept			{ return cbegin(); }
 		const_iterator end() const noexcept				{ return cend(); }
 
