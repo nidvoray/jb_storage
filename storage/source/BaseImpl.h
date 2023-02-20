@@ -41,16 +41,19 @@ namespace jb_storage
 
 			do
 			{
-				for (; key != end; ++key)
+				if (key != end)
 				{
-					locker.Push(current);
-					if (const auto child{ child_getter(current, *key) })
-						current = child;
-					else
-						break;
-				}
+					for (; key != end; ++key)
+					{
+						locker.Push(current);
+						if (const auto child{ child_getter(current, *key) })
+							current = child;
+						else
+							break;
+					}
 
-				locker.Pop();
+					locker.Pop();
+				}
 
 				std::unique_lock lock{ *current };
 
