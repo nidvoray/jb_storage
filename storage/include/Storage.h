@@ -32,6 +32,7 @@ namespace jb_storage
 
 	public:
 		Storage();
+		~Storage();
 
 		std::optional<Value> Get(const std::string& path) const override;
 		bool SetOrInsert(const std::string& path, const Value& value) const override;

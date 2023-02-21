@@ -223,6 +223,8 @@ namespace jb_storage
 		_impl{ std::make_unique<Impl>() }
 	{ }
 
+	Storage::~Storage() = default;
+
 	std::optional<Value> Storage::Get(const std::string& path) const
 	{ return _impl->Get(path); }
 
