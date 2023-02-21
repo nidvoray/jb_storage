@@ -50,7 +50,7 @@ namespace jb_storage
 	std::pair<INodePtr, utility::TraceLocker> BaseImpl::LockPath(const std::string& path_) const
 	{
 		const utility::Path path{ path_ };
-		utility::TraceLocker locker{ path.GetDepth() };
+		utility::TraceLocker locker{ path.GetDepth() + 1 };
 
 		auto current{ _root };
 		for (auto key{ path.begin() }, end{ path.end() }; key != end && current; ++key)
