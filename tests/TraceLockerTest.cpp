@@ -77,18 +77,18 @@ TEST(TraceLockerTest, Consistency)
 		}
 
 		for (auto i = 0; i < depth; ++i)
-			ASSERT_EQ(nodes[i]->Mutex.try_lock(), false);
+			ASSERT_FALSE(nodes[i]->Mutex.try_lock());
 
 		locker.Pop();
 
 		for (auto i = 0; i < depth - 1; ++i)
-			ASSERT_EQ(nodes[i]->Mutex.try_lock(), false);
+			ASSERT_FALSE(nodes[i]->Mutex.try_lock());
 
-		ASSERT_EQ(nodes[depth - 1]->Mutex.try_lock(), true);
+		ASSERT_TRUE(nodes[depth - 1]->Mutex.try_lock());
 	}
 
 	for (auto i = 0; i < depth - 1; ++i)
-		ASSERT_EQ(nodes[i]->Mutex.try_lock(), true);
+		ASSERT_TRUE(nodes[i]->Mutex.try_lock());
 }
 
 TEST(TraceLockerTest, KeepOnReturn)
@@ -115,9 +115,9 @@ TEST(TraceLockerTest, KeepOnReturn)
 		utility::TraceLocker locker{ creator() };
 
 		for (auto i = 0; i < depth; ++i)
-			ASSERT_EQ(nodes[i]->Mutex.try_lock(), false);
+			ASSERT_FALSE(nodes[i]->Mutex.try_lock());
 	}
 
 	for (auto i = 0; i < depth; ++i)
-		ASSERT_EQ(nodes[i]->Mutex.try_lock(), true);
+		ASSERT_TRUE(nodes[i]->Mutex.try_lock());
 }

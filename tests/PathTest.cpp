@@ -45,7 +45,7 @@ TEST(PathTest, Depth)
 TEST(PathTest, Emptiness)
 {
 	const std::string source{ "/" };
-	ASSERT_EQ(utility::Path{ source }.IsEmpty(), true);
+	ASSERT_TRUE(utility::Path{ source }.IsEmpty());
 }
 
 TEST(PathTest, Rest)
