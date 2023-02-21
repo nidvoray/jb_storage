@@ -10,6 +10,7 @@ add_subdirectory(thirdparty/googletest)
 add_executable(storage-tests
 	PathTest.cpp
 	TraceLockerTest.cpp
+	VolumeTest.cpp
 )
 
 target_link_libraries(storage-tests 
