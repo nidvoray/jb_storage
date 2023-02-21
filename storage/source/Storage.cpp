@@ -189,16 +189,21 @@ namespace jb_storage
 
 	Storage::Impl::MountTokenImplPtr Storage::Impl::Mount(const std::string& where, const VolumeImplPtr& volume, const std::string& what) const
 	{
-		if (const auto [node, locker] { volume->LockPath(what) }; node)
+		if (const auto [volume_node, locker] { volume->LockPath(what) }; volume_node)
 		{
-			const auto holder{ std::make_shared<MountHolder>(node, volume) };
+			const auto holder{ std::make_shared<MountHolder>(volume_node, volume) };
 			VirtualNodePtr owner;
 
 			GrowBranchAndSetValue<VirtualNodePtr>(
 					_root,
 					where,
-					[](const auto& node, const auto& name) { return node->GetVirtualChild(name); },
-					[&holder, &owner](const auto& node, const auto& path) { owner = node->GrowBranchAndMount(path, holder); return true; });
+					[](const auto& storage_node, const auto& name) { return storage_node->GetVirtualChild(name); },
+					[&holder, &owner](const auto& storage_node, const auto& path)
+					{
+						const auto retval{ storage_node->GrowBranchAndMount(path, holder) };
+						owner = retval ? retval : storage_node; //workaround for returning shared_from_this() from GrowBranchAndMount()
+						return true;
+					});
 
 			return std::make_shared<MountTokenImpl>(owner, holder);
 		}
