@@ -19,10 +19,6 @@ namespace jb_storage
 	public:
 		VolumeImpl();
 
-		std::optional<Value> Get(const std::string& path) const;
-		bool SetOrInsert(const std::string& path, const Value& value) const;
-		bool Delete(const std::string& path) const;
-
 		using BaseImpl::LockPath;
 
 		void AddRef();
