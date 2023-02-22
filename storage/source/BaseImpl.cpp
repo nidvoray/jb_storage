@@ -15,7 +15,7 @@ namespace jb_storage
 		if (!path.GetDepth())
 			return false;
 
-		utility::TraceLocker locker{ path.GetDepth() };
+		utility::TraceLocker<INode> locker{ path.GetDepth() };
 
 		INodePtr parent;
 		auto current{ _root };
@@ -23,7 +23,7 @@ namespace jb_storage
 
 		for (auto key{ path.begin() }, end{ path.end() }; key != end && current; ++key)
 		{
-			locker.Push(current);
+			locker.Push(*current);
 			parent = current;
 			current = current->GetChild(key_name = *key);
 		}
@@ -47,25 +47,25 @@ namespace jb_storage
 				[&value](const auto& node, const auto& path) { return node->GrowBranchAndSetValue(path, value); });
 	}
 
-	std::pair<INodePtr, utility::TraceLocker> BaseImpl::LockPath(const std::string& path_) const
+	std::pair<INodePtr, utility::TraceLocker<INode>> BaseImpl::LockPath(const std::string& path_) const
 	{
 		const utility::Path path{ path_ };
-		utility::TraceLocker locker{ path.GetDepth() + 1 };
+		utility::TraceLocker<INode> locker{ path.GetDepth() + 1 };
 
 		auto current{ _root };
 		for (auto key{ path.begin() }, end{ path.end() }; key != end && current; ++key)
 		{
-			locker.Push(current);
+			locker.Push(*current);
 			current = current->GetChild(*key);
 		}
 
 		if (current)
 		{
-			locker.Push(current);
+			locker.Push(*current);
 			return std::make_pair(current, std::move(locker));
 		}
 
-		return std::make_pair(nullptr, utility::TraceLocker{ 0 });
+		return std::make_pair(nullptr, utility::TraceLocker<INode>{ 0 });
 	}
 
 }

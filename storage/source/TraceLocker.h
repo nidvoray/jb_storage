@@ -1,18 +1,17 @@
 #ifndef STORAGE_TRACELOCKER_H
 #define STORAGE_TRACELOCKER_H
 
-#include "INode.h"
-
 #include <shared_mutex>
 #include <vector>
 
 namespace jb_storage::utility
 {
 
+	template < typename LockType >
 	class TraceLocker final
 	{
 	private:
-		std::vector<std::shared_lock<INode>>	_trace;
+		std::vector<std::shared_lock<LockType>>	_trace;
 		size_t									_depth;
 
 	public:
@@ -29,12 +28,12 @@ namespace jb_storage::utility
 		~TraceLocker()
 		{  while (!_trace.empty()) _trace.pop_back(); }
 
-		void Push(const INodePtr& node)
+		void Push(LockType& obj)
 		{
 			if (_trace.size() == _depth)
 				throw std::out_of_range{ "trace depth " + std::to_string(_depth) + " exceeded!" };
 
-			_trace.push_back(std::shared_lock{ *node });
+			_trace.push_back(std::shared_lock{ obj });
 		}
 
 		void Pop()

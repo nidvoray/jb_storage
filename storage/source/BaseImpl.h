@@ -23,7 +23,7 @@ namespace jb_storage
 	protected:
 		explicit BaseImpl(const INodePtr& root) noexcept : _root{ root } { }
 
-		std::pair<INodePtr, utility::TraceLocker> LockPath(const std::string& path) const;
+		std::pair<INodePtr, utility::TraceLocker<INode>> LockPath(const std::string& path) const;
 
 		template <typename NodePointerType>
 		static bool GrowBranchAndSetValue(
@@ -33,7 +33,7 @@ namespace jb_storage
 				const std::function<bool (const NodePointerType&, const utility::Path& path)>& value_setter)
 		{
 			const utility::Path path{ path_ };
-			utility::TraceLocker locker{ path.GetDepth() };
+			utility::TraceLocker<INode> locker{ path.GetDepth() };
 
 			auto current{ root };
 			auto key{ path.begin() };
@@ -45,7 +45,7 @@ namespace jb_storage
 				{
 					for (; key != end; ++key)
 					{
-						locker.Push(current);
+						locker.Push(*current);
 						if (const auto child{ child_getter(current, *key) })
 							current = child;
 						else
