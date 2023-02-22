@@ -25,7 +25,7 @@ namespace jb_storage
 
 		std::pair<INodePtr, utility::TraceLocker<INode>> LockPath(const std::string& path) const;
 
-		template <typename NodePointerType>
+		template < typename NodePointerType, typename LockAdaptor = typename NodePointerType::element_type >
 		static bool GrowBranchAndSetValue(
 				const NodePointerType& root,
 				const std::string& path_,
@@ -33,7 +33,7 @@ namespace jb_storage
 				const std::function<bool (const NodePointerType&, const utility::Path& path)>& value_setter)
 		{
 			const utility::Path path{ path_ };
-			utility::TraceLocker<INode> locker{ path.GetDepth() };
+			utility::TraceLocker<LockAdaptor> locker{ path.GetDepth() };
 
 			auto current{ root };
 			auto key{ path.begin() };
@@ -55,7 +55,7 @@ namespace jb_storage
 					locker.Pop();
 				}
 
-				std::unique_lock lock{ *current };
+				std::unique_lock lock{ static_cast<LockAdaptor&>(*current) };
 
 				if (key != end && child_getter(current, *key))
 					continue;
