@@ -19,7 +19,7 @@ namespace jb_storage
 
 		public:
 			MountHolder(const INodePtr& node, const VolumeImplPtr& volume)
-				: _node(node), _volume(volume)
+				: _node{ node }, _volume{ volume }
 			{ volume->AddRef(); }
 
 			~MountHolder()
@@ -34,14 +34,28 @@ namespace jb_storage
 		using MountHolderPtr = std::shared_ptr<MountHolder>;
 		using MountHolderWeakPtr = std::weak_ptr<MountHolder>;
 
+		class VirtualNodeNonPolymorphicLockMixin
+		{
+		private:
+			MutexType	_lock;
+
+		public:
+			void lock()				{ _lock.lock(); }
+			void unlock()			{ _lock.unlock(); }
+			void lock_shared()		{ _lock.lock_shared();}
+			void unlock_shared()	{ _lock.unlock_shared();}
+
+		};
+
 		using VirtualNodePtr = std::shared_ptr<class VirtualNode>;
 
-		class VirtualNode final : public INode
+		class VirtualNode final : public INode, public VirtualNodeNonPolymorphicLockMixin
 		{
+			using NonPolymorphicBase = VirtualNodeNonPolymorphicLockMixin;
+
 		private:
 			std::vector<MountHolderPtr>				_mounted;
 			std::map<std::string, VirtualNodePtr>	_virtual_childs;
-			MutexType								_lock;
 
 		public:
 			std::optional<Value> GetValue() const override
@@ -80,26 +94,26 @@ namespace jb_storage
 
 			void lock() override
 			{
-				_lock.lock();
+				NonPolymorphicBase::lock();
 				std::for_each(_mounted.begin(), _mounted.end(), [](const auto& mounted) { mounted->GetNode()->lock(); } );
 			}
 
 			void unlock() override
 			{
 				std::for_each(_mounted.rbegin(), _mounted.rend(), [](const auto& mounted) { mounted->GetNode()->unlock(); } );
-				_lock.unlock();
+				NonPolymorphicBase::unlock();
 			}
 
 			void lock_shared() override
 			{
-				_lock.lock_shared();
+				NonPolymorphicBase::lock_shared();
 				std::for_each(_mounted.begin(), _mounted.end(), [](const auto& mounted) { mounted->GetNode()->lock_shared(); } );
 			}
 
 			void unlock_shared() override
 			{
 				std::for_each(_mounted.rbegin(), _mounted.rend(), [](const auto& mounted) { mounted->GetNode()->unlock_shared(); } );
-				_lock.unlock_shared();
+				NonPolymorphicBase::unlock_shared();
 			}
 
 			VirtualNodePtr GrowBranchAndMount(const utility::Path& path, const MountHolderPtr& holder)
@@ -176,12 +190,15 @@ namespace jb_storage
 		MountHolderWeakPtr			_holder;
 
 	public:
-		MountTokenImpl(const VirtualNodePtr& owner, const MountHolderPtr& holder) noexcept : _owner(owner), _holder(holder) { }
+		MountTokenImpl(const VirtualNodePtr& owner, const MountHolderPtr& holder) noexcept
+			: _owner{ owner }, _holder{ holder }
+		{ }
+
 		~MountTokenImpl()
 		{
 			if (const auto owner{ _owner.lock() })
 			{
-				std::unique_lock lock{ *owner };
+				std::unique_lock lock{ static_cast<VirtualNodeNonPolymorphicLockMixin&>(*owner) };
 				owner->Unmount(_holder);
 			}
 		}
@@ -194,7 +211,7 @@ namespace jb_storage
 			const auto holder{ std::make_shared<MountHolder>(volume_node, volume) };
 			VirtualNodePtr owner;
 
-			GrowBranchAndSetValue<VirtualNodePtr>(
+			GrowBranchAndSetValue<VirtualNodePtr, VirtualNodeNonPolymorphicLockMixin>(
 					_root,
 					where,
 					[](const auto& storage_node, const auto& name) { return storage_node->GetVirtualChild(name); },
