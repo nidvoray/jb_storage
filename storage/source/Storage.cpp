@@ -55,7 +55,7 @@ namespace jb_storage
 
 		private:
 			std::vector<MountHolderPtr>				_mounted;
-			std::map<std::string, VirtualNodePtr>	_virtual_childs;
+			std::map<std::string, VirtualNodePtr>	_virtual_children;
 
 		public:
 			std::optional<Value> GetValue() const override
@@ -89,7 +89,7 @@ namespace jb_storage
 					if ((*rmounted)->GetNode()->DeleteChild(name))
 						return true;
 
-				return _virtual_childs.erase(name) != 0;
+				return _virtual_children.erase(name) != 0;
 			}
 
 			void lock() override
@@ -143,8 +143,8 @@ namespace jb_storage
 
 			VirtualNodePtr GetVirtualChild(const std::string& name) const
 			{
-				const auto child{ _virtual_childs.find(name) };
-				return child != _virtual_childs.end() ? child->second : nullptr;
+				const auto child{ _virtual_children.find(name) };
+				return child != _virtual_children.end() ? child->second : nullptr;
 			}
 
 			void Unmount(const MountHolderWeakPtr& holder_weak)
@@ -157,7 +157,7 @@ namespace jb_storage
 		private:
 			VirtualNodePtr SetVirtualChild(const std::string& name, const VirtualNodePtr& child)
 			{
-				_virtual_childs.insert_or_assign(name, child);
+				_virtual_children.insert_or_assign(name, child);
 				return child;
 			}
 
