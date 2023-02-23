@@ -11,6 +11,7 @@ add_compile_definitions(USE_STDCXX_MUTEX)
 
 add_executable(storage-tests
 	PathTest.cpp
+	StabilityTest.cpp
 	StorageTest.cpp
 	TraceLockerTest.cpp
 	VolumeTest.cpp
