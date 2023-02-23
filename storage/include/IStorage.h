@@ -16,6 +16,9 @@ namespace jb_storage
 		IStorage(const IStorage&) = delete;
 		IStorage& operator = (const IStorage&) = delete;
 
+		IStorage(IStorage&&) = default;
+		IStorage& operator = (IStorage&&) = default;
+
 		virtual std::optional<Value> Get(const std::string& path) const = 0;
 		virtual bool SetOrInsert(const std::string& path, const Value& value) const = 0;
 		virtual bool Delete(const std::string& path) const = 0;
