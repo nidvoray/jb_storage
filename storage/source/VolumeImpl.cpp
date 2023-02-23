@@ -16,7 +16,7 @@ namespace jb_storage
 
 		private:
 			Value							_value;
-			std::map<std::string, INodePtr>	_childs;
+			std::map<std::string, INodePtr>	_children;
 			MutexType						_lock;
 
 		public:
@@ -48,12 +48,12 @@ namespace jb_storage
 
 			INodePtr GetChild(const std::string& name) const override
 			{
-				const auto child{ _childs.find(name) };
-				return child != _childs.end() ? child->second : nullptr;
+				const auto child{ _children.find(name) };
+				return child != _children.end() ? child->second : nullptr;
 			}
 
 			bool DeleteChild(const std::string& name) override
-			{ return _childs.erase(name) != 0; }
+			{ return _children.erase(name) != 0; }
 
 			void lock() override
 			{ _lock.lock(); }
@@ -70,7 +70,7 @@ namespace jb_storage
 		private:
 			NodePtr SetChild(const std::string& name, const NodePtr& child)
 			{
-				_childs.insert_or_assign(name, child);
+				_children.insert_or_assign(name, child);
 				return child;
 			}
 		};
