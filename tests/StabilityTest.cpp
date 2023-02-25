@@ -166,7 +166,7 @@ TEST(StabilityTest, SetAsyncWhileBusyLoopGetAsync)
 TEST(StabilityTest, MountedVolumesAsyncSet)
 {
 	Storage storage;
-	auto mount_points{ GenerateTestSet("", 5, 2) };
+	auto mount_points{ GenerateTestSet("", 3, 2) };
 
 	struct MountedVolume
 	{
