@@ -16,7 +16,7 @@ namespace
 
 TEST(StabilityTest, SetAsync)
 {
-	Volume volume;
+	const Volume volume;
 	const auto test_set{ GenerateTestSet("", 5, 6) };
 
 	std::vector<std::thread> threads;
@@ -37,7 +37,7 @@ TEST(StabilityTest, SetAsync)
 
 TEST(StabilityTest, DeleteAsync)
 {
-	Volume volume;
+	const Volume volume;
 	const auto test_set{ GenerateTestSet("", 5, 6) };
 
 	for (const auto& entity : test_set)
@@ -57,7 +57,7 @@ TEST(StabilityTest, DeleteAsync)
 
 TEST(StabilityTest, SetAsyncWhileBusyLoopGetAsync)
 {
-	Volume volume;
+	const Volume volume;
 	const auto test_set{ GenerateTestSet("", 4, 5) };
 
 	std::vector<std::thread> setters;
@@ -108,7 +108,7 @@ TEST(StabilityTest, SetAsyncWhileBusyLoopGetAsync)
 
 TEST(StabilityTest, MountedVolumesAsyncSet)
 {
-	Storage storage;
+	const Storage storage;
 	auto mount_points{ GenerateTestSet("", 3, 2) };
 
 	struct MountedVolume
