@@ -27,11 +27,13 @@ namespace jb_storage
 		void AddRef();
 		void Release();
 
-		void Load(std::istream& is) const;
-		void Save(std::ostream& os) const;
+		bool Load(std::istream& is) const;
+		bool Save(std::ostream& os) const;
 
 	private:
 		explicit VolumeImpl(const NodePtr& root) noexcept;
+
+		bool IsUsed() const noexcept;
 	};
 
 	using VolumeImplPtr = std::shared_ptr<VolumeImpl>;

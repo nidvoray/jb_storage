@@ -26,8 +26,8 @@ namespace jb_storage
 		bool SetOrInsert(const std::string& path, const Value& value) const override;
 		bool Delete(const std::string& path) const override;
 
-		void Load(std::istream& is) const;
-		void Save(std::ostream& os) const;
+		bool Load(std::istream& is) const;
+		bool Save(std::ostream& os) const;
 	};
 
 }

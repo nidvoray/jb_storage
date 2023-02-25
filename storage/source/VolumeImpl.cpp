@@ -1,6 +1,7 @@
 #include "VolumeImpl.h"
 
 #include "Mutex.h"
+#include "Serialization.h"
 
 #include <map>
 
@@ -11,7 +12,7 @@ namespace jb_storage
 	{
 	private:
 		Value							_value;
-		std::map<std::string, INodePtr>	_children;
+		std::map<std::string, NodePtr>	_children;
 		MutexType						_lock;
 
 	public:
@@ -62,6 +63,41 @@ namespace jb_storage
 		void unlock_shared() override
 		{ _lock.unlock_shared(); }
 
+		void swap(Node& other) noexcept
+		{
+			_value.swap(other._value);
+			_children.swap(other._children);
+		}
+
+		void Serialize(std::ostream& os) const
+		{
+			utility::Serialize(_value, os);
+			utility::Serialize(static_cast<uint64_t>(_children.size()), os);
+
+			for (const auto& child : _children)
+			{
+				utility::Serialize(child.first, os);
+				child.second->Serialize(os);
+			}
+		}
+
+		void Deserialize(std::istream& is)
+		{
+			Node node;
+			node._value = utility::Deserialize<Value>(is);
+
+			const auto count{ utility::Deserialize<uint64_t>(is) };
+			for (uint64_t i{ 0 }; i < count; ++i)
+			{
+				const auto name{ utility::Deserialize<std::string>(is) };
+				const auto child{ std::make_shared<Node>() };
+				child->Deserialize(is);
+				node.SetChild(name, child);
+			}
+
+			swap(node);
+		}
+
 	private:
 		NodePtr SetChild(const std::string& name, const NodePtr& child)
 		{
@@ -80,26 +116,63 @@ namespace jb_storage
 	void VolumeImpl::Release()
 	{ _refcounter.fetch_sub(1, std::memory_order_relaxed); }
 
-	void VolumeImpl::Load(std::istream& is) const
+	bool VolumeImpl::Load(std::istream& is) const
 	{
-		if (_refcounter.load(std::memory_order_acquire) == 0)
+		if (IsUsed())
+			return false;
+
+		std::unique_lock lock{ *_root };
+
+		if (IsUsed())
+			return false;
+
+		const auto saved_state{ is.exceptions() };
+		is.exceptions(std::ios::failbit | std::ios::badbit);
+
+		bool status{ true };
+		try
 		{
-			std::unique_lock lock{ *_root };
-			// TODO: load data here
+			const auto creature{ std::make_shared<Node>() };
+			creature->Deserialize(is);
+			_root->swap(*creature);
 		}
+		catch (const std::exception& e)
+		{ status = false; }
+
+		is.exceptions(saved_state);
+
+		return status;
 	}
 
-	void VolumeImpl::Save(std::ostream& os) const
+	bool VolumeImpl::Save(std::ostream& os) const
 	{
-		if (_refcounter.load(std::memory_order_acquire) == 0)
-		{
-			std::unique_lock lock{ *_root };
-			// TODO: save data here
-		}
+		if (IsUsed())
+			return false;
+
+		std::unique_lock lock{ *_root };
+
+		if (IsUsed())
+			return false;
+
+		const auto saved_state{ os.exceptions() };
+		os.exceptions(std::ios::failbit | std::ios::badbit);
+
+		bool status{ true };
+		try
+		{ _root->Serialize(os); }
+		catch (const std::exception& e)
+		{ status = false; }
+
+		os.exceptions(saved_state);
+
+		return status;
 	}
 
 	VolumeImpl::VolumeImpl(const NodePtr& root) noexcept
-		: BaseImpl(root), _root(root)
+		: BaseImpl(root), _root(root), _refcounter{ 0 }
 	{ }
+
+	bool VolumeImpl::IsUsed() const noexcept
+	{ return _refcounter.load(std::memory_order_acquire) != 0; }
 
 }

@@ -18,10 +18,10 @@ namespace jb_storage
 	bool Volume::Delete(const std::string& path) const
 	{ return _impl->Delete(path); }
 
-	void Volume::Load(std::istream& is) const
-	{ _impl->Load(is); }
+	bool Volume::Load(std::istream& is) const
+	{ return _impl->Load(is); }
 
-	void Volume::Save(std::ostream& os) const
-	{ _impl->Save(os); }
+	bool Volume::Save(std::ostream& os) const
+	{ return _impl->Save(os); }
 
 }
