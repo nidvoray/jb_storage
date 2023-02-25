@@ -16,6 +16,7 @@ add_executable(storage-tests
 	VolumeTest.cpp
 	StorageTest.cpp
 	StabilityTest.cpp
+	TestSet.cpp
 )
 
 target_link_libraries(storage-tests 
