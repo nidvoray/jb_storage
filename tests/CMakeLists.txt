@@ -15,6 +15,7 @@ add_executable(storage-tests
 	SerializationTest.cpp
 	VolumeTest.cpp
 	StorageTest.cpp
+	SaveLoadTest.cpp
 	StabilityTest.cpp
 	TestSet.cpp
 )
