@@ -11,11 +11,11 @@ add_compile_definitions(USE_STDCXX_MUTEX)
 
 add_executable(storage-tests
 	PathTest.cpp
-	SerializationTest.cpp
-	StabilityTest.cpp
-	StorageTest.cpp
 	TraceLockerTest.cpp
+	SerializationTest.cpp
 	VolumeTest.cpp
+	StorageTest.cpp
+	StabilityTest.cpp
 )
 
 target_link_libraries(storage-tests 
