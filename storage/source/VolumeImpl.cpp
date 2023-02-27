@@ -136,7 +136,7 @@ namespace jb_storage
 			creature->Deserialize(is);
 			_root->swap(*creature);
 		}
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{ status = false; }
 
 		is.exceptions(saved_state);
@@ -160,7 +160,7 @@ namespace jb_storage
 		bool status{ true };
 		try
 		{ _root->Serialize(os); }
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{ status = false; }
 
 		os.exceptions(saved_state);
