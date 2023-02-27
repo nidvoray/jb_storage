@@ -5,6 +5,7 @@
 #include "Path.h"
 #include "TraceLocker.h"
 
+#include <mutex>
 #include <utility>
 
 namespace jb_storage

@@ -54,7 +54,7 @@ namespace jb_storage::utility
 
 		using MantissaCoverageType = std::conditional_t<std::is_same_v<T, float>, int32_t, int64_t>;
 
-		Serialize(static_cast<MantissaCoverageType>(mantissa * std::numeric_limits<MantissaCoverageType>::max()), os);
+		Serialize(static_cast<MantissaCoverageType>(mantissa * static_cast<T>(std::numeric_limits<MantissaCoverageType>::max())), os);
 		Serialize(static_cast<int32_t>(exponent), os);
 	}
 
@@ -66,7 +66,7 @@ namespace jb_storage::utility
 		const auto mantissa{ Deserialize<MantissaCoverageType>(is) };
 		const auto exponent{ Deserialize<int32_t>(is) };
 
-		return ldexp(static_cast<T>(mantissa) / std::numeric_limits<MantissaCoverageType>::max(), exponent);
+		return ldexp(static_cast<T>(mantissa) / static_cast<T>(std::numeric_limits<MantissaCoverageType>::max()), exponent);
 	}
 
 	template < typename T >

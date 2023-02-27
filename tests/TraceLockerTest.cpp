@@ -33,7 +33,7 @@ TEST(TraceLockerTest, Underflow)
 	for (auto& lock : locks)
 		locker.Push(lock);
 
-	for (auto& lock : locks)
+	for ([[maybe_unused]] auto& lock : locks)
 		locker.Pop();
 
 	ASSERT_THROW(locker.Pop(), std::out_of_range);
