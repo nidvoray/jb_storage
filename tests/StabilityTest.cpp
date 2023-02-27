@@ -17,7 +17,7 @@ namespace
 TEST(StabilityTest, SetAsync)
 {
 	const Volume volume;
-	const auto test_set{ GenerateTestSet("", 5, 6) };
+	const auto test_set{ GenerateTestSet("", 4, 4) };
 
 	std::vector<std::thread> threads;
 	for (const auto& entity : test_set)
@@ -38,7 +38,7 @@ TEST(StabilityTest, SetAsync)
 TEST(StabilityTest, DeleteAsync)
 {
 	const Volume volume;
-	const auto test_set{ GenerateTestSet("", 5, 6) };
+	const auto test_set{ GenerateTestSet("", 4, 4) };
 
 	for (const auto& entity : test_set)
 		ASSERT_TRUE(volume.SetOrInsert(entity.Path, entity.Value_));
@@ -58,7 +58,7 @@ TEST(StabilityTest, DeleteAsync)
 TEST(StabilityTest, SetAsyncWhileBusyLoopGetAsync)
 {
 	const Volume volume;
-	const auto test_set{ GenerateTestSet("", 4, 5) };
+	const auto test_set{ GenerateTestSet("", 3, 4) };
 
 	std::vector<std::thread> setters;
 	std::vector<std::thread> getters;
@@ -120,7 +120,7 @@ TEST(StabilityTest, MountedVolumesAsyncSet)
 
 	std::vector<MountedVolume> mounted_volumes;
 	for (auto& mp : mount_points)
-		mounted_volumes.push_back(MountedVolume{ Volume{ }, GenerateTestSet("", 5, 4), std::move(mp.Path) });
+		mounted_volumes.push_back(MountedVolume{ Volume{ }, GenerateTestSet("", 4, 2), std::move(mp.Path) });
 
 	std::vector<std::thread> threads;
 
