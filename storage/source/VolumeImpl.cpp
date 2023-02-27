@@ -111,10 +111,10 @@ namespace jb_storage
 	{ }
 
 	void VolumeImpl::AddRef()
-	{ _refcounter.fetch_add(1, std::memory_order_relaxed); }
+	{ _refcounter.fetch_add(1, std::memory_order_release); }
 
 	void VolumeImpl::Release()
-	{ _refcounter.fetch_sub(1, std::memory_order_relaxed); }
+	{ _refcounter.fetch_sub(1, std::memory_order_release); }
 
 	bool VolumeImpl::Load(std::istream& is) const
 	{
