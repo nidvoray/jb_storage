@@ -5,6 +5,7 @@
 #include "Path.h"
 #include "TraceLocker.h"
 
+#include <functional>
 #include <mutex>
 #include <utility>
 
