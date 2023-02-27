@@ -8,10 +8,10 @@ using namespace jb_storage;
 
 TEST(SerializationTest, AllTypes)
 {
-	const Value uint64{ 0xFF000000000000FF };
-	const Value uint32{ 0xFF0000FF };
-	const Value flt{ 42.f };
-	const Value dbl{ 42. };
+	const Value uint64{ uint64_t{ 0xFF000000000000FF } };
+	const Value uint32{ uint32_t{ 0xFF0000FF } };
+	const Value flt{ 1.f };
+	const Value dbl{ 1. };
 	const Value str{ "42" };
 	const Value blob{ Blob{ 4, 2 } };
 	const Value none{ };

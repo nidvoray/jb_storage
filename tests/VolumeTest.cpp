@@ -8,10 +8,10 @@ TEST(VolumeTest, SetRoot)
 {
 	const Volume volume;
 
-	ASSERT_TRUE(volume.SetOrInsert("/", 42u));
+	ASSERT_TRUE(volume.SetOrInsert("/", uint32_t{ 42 }));
 
 	const auto value{ volume.Get("/") };
-	ASSERT_TRUE(value && std::holds_alternative<uint32_t>(*value) && std::get<uint32_t>(*value) == 42u);
+	ASSERT_TRUE(value && std::holds_alternative<uint32_t>(*value) && std::get<uint32_t>(*value) == 42);
 }
 
 TEST(VolumeTest, DeleteRoot)
@@ -24,26 +24,26 @@ TEST(VolumeTest, SetAndResetNonRoot)
 {
 	const Volume volume;
 
-	ASSERT_TRUE(volume.SetOrInsert("/foo/bar", 42u));
+	ASSERT_TRUE(volume.SetOrInsert("/foo/bar", uint32_t{ 42 }));
 
 	{
 		const auto bar{ volume.Get("/foo/bar") };
 		const auto foo{ volume.Get("/foo") };
 
-		ASSERT_NO_THROW(ASSERT_TRUE(bar && std::get<uint32_t>(*bar) == 42u));
+		ASSERT_NO_THROW(ASSERT_TRUE(bar && std::get<uint32_t>(*bar) == 42));
 		ASSERT_TRUE(foo && std::holds_alternative<std::monostate>(*foo));
 	}
 
 	ASSERT_TRUE(volume.SetOrInsert("/foo/bar/baz", 42.));
 	ASSERT_TRUE(volume.SetOrInsert("/foo/bar", "42"));
-	ASSERT_TRUE(volume.SetOrInsert("/foo", 42u));
+	ASSERT_TRUE(volume.SetOrInsert("/foo", uint32_t{ 42 }));
 
 	{
 		const auto foo{ volume.Get("/foo") };
 		const auto bar{ volume.Get("/foo/bar") };
 		const auto baz{ volume.Get("/foo/bar/baz") };
 
-		ASSERT_NO_THROW(ASSERT_TRUE(foo && std::get<uint32_t>(*foo) == 42u));
+		ASSERT_NO_THROW(ASSERT_TRUE(foo && std::get<uint32_t>(*foo) == 42));
 		ASSERT_NO_THROW(ASSERT_TRUE(bar && std::get<std::string>(*bar) == "42"));
 		ASSERT_NO_THROW(ASSERT_TRUE(baz && std::get<double>(*baz) == 42.));
 	}
@@ -53,7 +53,7 @@ TEST(VolumeTest, DeleteNonRoot)
 {
 	const Volume volume;
 
-	ASSERT_TRUE(volume.SetOrInsert("/foo/bar/baz", 42u));
+	ASSERT_TRUE(volume.SetOrInsert("/foo/bar/baz", uint32_t{ 42 }));
 	ASSERT_TRUE(volume.SetOrInsert("/foo/bar/qux", "42"));
 	ASSERT_TRUE(volume.SetOrInsert("/foo", 42.));
 

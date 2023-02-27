@@ -43,7 +43,7 @@ TEST(SaveLoadTest, DontSaveLoadIfMounted)
 		const auto token{ storage.Mount("/", src, "/") };
 		ASSERT_TRUE(token);
 
-		ASSERT_TRUE(storage.SetOrInsert("/foo/bar", 42lu));
+		ASSERT_TRUE(storage.SetOrInsert("/foo/bar", uint64_t{ 42 }));
 
 		ASSERT_FALSE(src.Save(stream));
 	}
@@ -63,5 +63,5 @@ TEST(SaveLoadTest, DontSaveLoadIfMounted)
 	ASSERT_TRUE(dst.Load(stream));
 
 	const auto bar{ dst.Get("/foo/bar") };
-	ASSERT_NO_THROW(ASSERT_TRUE(bar && std::get<uint64_t>(*bar) == 42lu));
+	ASSERT_NO_THROW(ASSERT_TRUE(bar && std::get<uint64_t>(*bar) == 42));
 }

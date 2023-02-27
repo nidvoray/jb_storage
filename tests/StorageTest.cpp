@@ -9,7 +9,7 @@ TEST(StorageTest, MountUnmount)
 	const Volume volume;
 	const Storage storage;
 
-	ASSERT_TRUE(volume.SetOrInsert("/foo/bar", 42u));
+	ASSERT_TRUE(volume.SetOrInsert("/foo/bar", uint32_t{ 42 }));
 
 	{
 		const auto token{ storage.Mount("/vol", volume, "/") };
@@ -17,7 +17,7 @@ TEST(StorageTest, MountUnmount)
 		ASSERT_TRUE(token);
 
 		const auto bar{ storage.Get("/vol/foo/bar") };
-		ASSERT_NO_THROW(ASSERT_TRUE(bar && std::get<uint32_t>(*bar) == 42u));
+		ASSERT_NO_THROW(ASSERT_TRUE(bar && std::get<uint32_t>(*bar) == 42));
 	}
 
 	ASSERT_TRUE(volume.Get("/foo/bar"));
@@ -37,7 +37,7 @@ TEST(StorageTest, MountSameNodeToDifferentPoints)
 	const Volume volume;
 	const Storage storage;
 
-	ASSERT_TRUE(volume.SetOrInsert("/foo/bar", 42u));
+	ASSERT_TRUE(volume.SetOrInsert("/foo/bar", uint32_t{ 42 }));
 
 	{
 		const auto token1{ storage.Mount("/mp1", volume, "/") };
@@ -46,10 +46,10 @@ TEST(StorageTest, MountSameNodeToDifferentPoints)
 		ASSERT_TRUE(token1 && token2);
 
 		const auto mp1bar{ storage.Get("/mp1/foo/bar") };
-		ASSERT_NO_THROW(ASSERT_TRUE(mp1bar && std::get<uint32_t>(*mp1bar) == 42u));
+		ASSERT_NO_THROW(ASSERT_TRUE(mp1bar && std::get<uint32_t>(*mp1bar) == 42));
 
 		auto mp2bar{ storage.Get("/mp2/foo/bar") };
-		ASSERT_NO_THROW(ASSERT_TRUE(mp1bar && std::get<uint32_t>(*mp1bar) == 42u));
+		ASSERT_NO_THROW(ASSERT_TRUE(mp1bar && std::get<uint32_t>(*mp1bar) == 42));
 
 		ASSERT_TRUE(storage.SetOrInsert("/mp1/foo/bar", "newval"));
 
@@ -102,7 +102,7 @@ TEST(StorageTest, Delete)
 	const Volume volume;
 	const Storage storage;
 
-	ASSERT_TRUE(volume.SetOrInsert("/foo/bar/baz", 42u) && volume.SetOrInsert("/foo/bar/qux", "42"));
+	ASSERT_TRUE(volume.SetOrInsert("/foo/bar/baz", uint32_t{ 42 }) && volume.SetOrInsert("/foo/bar/qux", "42"));
 
 	{
 		const auto token{ storage.Mount("/vol", volume, "/foo/bar") };
@@ -121,7 +121,7 @@ TEST(StorageTest, DeleteVirtualNodeWontDeleteRealOnes)
 	const Volume volume;
 	const Storage storage;
 
-	ASSERT_TRUE(volume.SetOrInsert("/foo/bar/baz", 42u) && volume.SetOrInsert("/foo/bar/qux", "42"));
+	ASSERT_TRUE(volume.SetOrInsert("/foo/bar/baz", uint32_t{ 42 }) && volume.SetOrInsert("/foo/bar/qux", "42"));
 
 	{
 		const auto token{ storage.Mount("/vol", volume, "/foo/bar") };
@@ -138,13 +138,13 @@ TEST(StorageTest, NoDataInVirtualNode)
 	const Volume volume;
 	const Storage storage;
 
-	ASSERT_TRUE(volume.SetOrInsert("/foo/bar", 42u));
+	ASSERT_TRUE(volume.SetOrInsert("/foo/bar", uint32_t{ 42 }));
 
 	{
 		const auto token{ storage.Mount("/foo/vol", volume, "/foo/bar") };
 		ASSERT_TRUE(token);
 
 		ASSERT_FALSE(storage.Get("/foo"));
-		ASSERT_FALSE(storage.SetOrInsert("/foo", 42u));
+		ASSERT_FALSE(storage.SetOrInsert("/foo", uint32_t{ 42 }));
 	}
 }
