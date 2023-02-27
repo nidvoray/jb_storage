@@ -14,7 +14,15 @@ namespace jb_storage::utility
 {
 
 	template < typename T >
-	auto Serialize(T val, std::ostream& os) -> std::enable_if_t<std::is_integral_v<T>>
+	auto Serialize(T val, std::ostream& os) -> std::enable_if_t<std::is_integral_v<T> && sizeof(T) == 1>
+	{ os.put(val); }
+
+	template < typename T >
+	std::enable_if_t<std::is_integral_v<T> && sizeof(T) == 1, T> Deserialize(std::istream& is)
+	{ return is.get();}
+
+	template < typename T >
+	auto Serialize(T val, std::ostream& os) -> std::enable_if_t<std::is_integral_v<T> && sizeof(T) != 1>
 	{
 		std::array<char, sizeof(T)> buffer;
 		for (auto& ch : buffer)
@@ -26,7 +34,7 @@ namespace jb_storage::utility
 	}
 
 	template < typename T >
-	std::enable_if_t<std::is_integral_v<T>, T> Deserialize(std::istream& is)
+	std::enable_if_t<std::is_integral_v<T> && sizeof(T) != 1, T> Deserialize(std::istream& is)
 	{
 		T val{ };
 
