@@ -12,7 +12,7 @@ namespace jb_storage
 		class MountTokenImpl;
 
 	public:
-		class MountToken
+		class MountToken final
 		{
 			friend class Storage;
 			using MountTokenImplPtr = std::shared_ptr<MountTokenImpl>;

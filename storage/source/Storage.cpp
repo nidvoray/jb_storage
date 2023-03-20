@@ -183,7 +183,7 @@ namespace jb_storage
 		Impl(const VirtualNodePtr& root) noexcept : BaseImpl{ root }, _root{ root } { }
 	};
 
-	class Storage::MountTokenImpl
+	class Storage::MountTokenImpl final
 	{
 	private:
 		std::weak_ptr<VirtualNode>	_owner;
