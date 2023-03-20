@@ -77,7 +77,7 @@ namespace jb_storage
 			INodePtr GetChild(const std::string& name) const override
 			{
 				for (auto rmounted{ _mounted.rbegin() }, rend{ _mounted.rend() }; rmounted != rend; ++rmounted)
-					if (const auto child = (*rmounted)->GetNode()->GetChild(name))
+					if (const auto child{ (*rmounted)->GetNode()->GetChild(name) })
 						return child;
 
 				return GetVirtualChild(name);
@@ -228,7 +228,6 @@ namespace jb_storage
 		return nullptr;
 	}
 
-
 	Storage::MountToken::operator bool () const noexcept
 	{ return !!_impl; }
 
@@ -236,8 +235,8 @@ namespace jb_storage
 		: _impl{ impl }
 	{ }
 
-	Storage::Storage() :
-		_impl{ std::make_unique<Impl>() }
+	Storage::Storage()
+		: _impl{ std::make_unique<Impl>() }
 	{ }
 
 	Storage::~Storage() = default;

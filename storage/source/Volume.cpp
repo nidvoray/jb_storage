@@ -5,8 +5,8 @@
 namespace jb_storage
 {
 
-	Volume::Volume() :
-		_impl{ std::make_shared<VolumeImpl>() }
+	Volume::Volume()
+		: _impl{ std::make_shared<VolumeImpl>() }
 	{ }
 
 	std::optional<Value> Volume::Get(const std::string& path) const

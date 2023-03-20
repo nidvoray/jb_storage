@@ -19,7 +19,7 @@ namespace jb_storage::utility
 
 	template < typename T >
 	std::enable_if_t<std::is_integral_v<T> && sizeof(T) == 1, T> Deserialize(std::istream& is)
-	{ return is.get();}
+	{ return is.get(); }
 
 	template < typename T >
 	auto Serialize(T val, std::ostream& os) -> std::enable_if_t<std::is_integral_v<T> && sizeof(T) != 1>
@@ -66,7 +66,7 @@ namespace jb_storage::utility
 		const auto mantissa{ Deserialize<MantissaCoverageType>(is) };
 		const auto exponent{ Deserialize<int32_t>(is) };
 
-		return ldexp(static_cast<T>(mantissa) / static_cast<T>(std::numeric_limits<MantissaCoverageType>::max()), exponent);
+		return std::ldexp(static_cast<T>(mantissa) / static_cast<T>(std::numeric_limits<MantissaCoverageType>::max()), exponent);
 	}
 
 	template < typename T >

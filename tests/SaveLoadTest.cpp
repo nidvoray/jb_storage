@@ -15,7 +15,7 @@ TEST(SaveLoadTest, SaveLoad)
 	for (const auto& entity : test_set)
 		ASSERT_TRUE(src.SetOrInsert(entity.Path, entity.Value_));
 
-	std::stringstream stream(std::ios_base::in | std::ios_base::out | std::ios_base::binary);
+	std::stringstream stream{ std::ios_base::in | std::ios_base::out | std::ios_base::binary };
 
 	ASSERT_TRUE(src.Save(stream));
 
@@ -37,7 +37,7 @@ TEST(SaveLoadTest, DontSaveLoadIfMounted)
 	const Volume src;
 	const Storage storage;
 
-	std::stringstream stream(std::ios_base::in | std::ios_base::out | std::ios_base::binary);
+	std::stringstream stream{ std::ios_base::in | std::ios_base::out | std::ios_base::binary };
 
 	{
 		const auto token{ storage.Mount("/", src, "/") };

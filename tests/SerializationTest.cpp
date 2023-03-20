@@ -10,13 +10,13 @@ TEST(SerializationTest, AllTypes)
 {
 	const Value uint64{ uint64_t{ 0xFF000000000000FF } };
 	const Value uint32{ uint32_t{ 0xFF0000FF } };
-	const Value flt{ 1.f };
-	const Value dbl{ 1. };
+	const Value flt{ 42.f };
+	const Value dbl{ 42. };
 	const Value str{ "42" };
 	const Value blob{ Blob{ 4, 2 } };
 	const Value none{ };
 
-	std::stringstream stream(std::ios_base::in | std::ios_base::out | std::ios_base::binary);
+	std::stringstream stream{ std::ios_base::in | std::ios_base::out | std::ios_base::binary };
 
 	utility::Serialize(uint64, stream);
 	utility::Serialize(uint32, stream);

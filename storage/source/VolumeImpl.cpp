@@ -169,7 +169,7 @@ namespace jb_storage
 	}
 
 	VolumeImpl::VolumeImpl(const NodePtr& root) noexcept
-		: BaseImpl(root), _root(root), _refcounter{ 0 }
+		: BaseImpl{ root }, _root{ root }, _refcounter{ 0 }
 	{ }
 
 	bool VolumeImpl::IsUsed() const noexcept
