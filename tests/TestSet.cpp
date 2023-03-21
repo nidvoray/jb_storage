@@ -1,6 +1,7 @@
 #include "TestSet.h"
 
 #include <algorithm>
+#include <iterator>
 #include <random>
 #include <set>
 
