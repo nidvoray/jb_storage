@@ -110,10 +110,10 @@ namespace jb_storage
 		: VolumeImpl{ std::make_shared<Node>() }
 	{ }
 
-	void VolumeImpl::AddRef()
+	void VolumeImpl::AddRef() noexcept
 	{ _refcounter.fetch_add(1, std::memory_order_release); }
 
-	void VolumeImpl::Release()
+	void VolumeImpl::Release() noexcept
 	{ _refcounter.fetch_sub(1, std::memory_order_release); }
 
 	bool VolumeImpl::Load(std::istream& is) const

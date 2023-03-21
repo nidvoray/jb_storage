@@ -18,7 +18,7 @@ namespace jb_storage
 			std::weak_ptr<VolumeImpl>	_volume;
 
 		public:
-			MountHolder(const INodePtr& node, const VolumeImplPtr& volume)
+			MountHolder(const INodePtr& node, const VolumeImplPtr& volume) noexcept
 				: _node{ node }, _volume{ volume }
 			{ volume->AddRef(); }
 
@@ -28,7 +28,7 @@ namespace jb_storage
 					volume->Release();
 			}
 
-			 INodePtr GetNode() const { return _node; }
+			 INodePtr GetNode() const noexcept { return _node; }
 		};
 
 		using MountHolderPtr = std::shared_ptr<MountHolder>;

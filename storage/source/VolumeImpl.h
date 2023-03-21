@@ -24,8 +24,8 @@ namespace jb_storage
 
 		using BaseImpl::LockPath;
 
-		void AddRef();
-		void Release();
+		void AddRef() noexcept;
+		void Release() noexcept;
 
 		bool Load(std::istream& is) const;
 		bool Save(std::ostream& os) const;
