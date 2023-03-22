@@ -214,8 +214,8 @@ namespace jb_storage
 			GrowBranchAndSetValue<VirtualNodePtr, VirtualNodeNonPolymorphicLockMixin>(
 					_root,
 					where,
-					[](const auto& storage_node, const auto& name) { return storage_node->GetVirtualChild(name); },
-					[&holder, &owner](const auto& storage_node, const auto& path)
+					[](const VirtualNodePtr& storage_node, const auto& name) { return storage_node->GetVirtualChild(name); },
+					[&holder, &owner](const VirtualNodePtr& storage_node, const auto& path)
 					{
 						const auto retval{ storage_node->GrowBranchAndMount(path, holder) };
 						owner = retval ? retval : storage_node; //workaround for returning shared_from_this() from GrowBranchAndMount()

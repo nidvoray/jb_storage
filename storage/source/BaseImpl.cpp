@@ -40,11 +40,11 @@ namespace jb_storage
 
 	bool BaseImpl::SetOrInsert(const std::string& path, const Value& value) const
 	{
-		return GrowBranchAndSetValue<INodePtr>(
+		return GrowBranchAndSetValue(
 				_root,
 				path,
-				[](const auto& node, const auto& name) { return node->GetChild(name); },
-				[&value](const auto& node, const auto& path) { return node->GrowBranchAndSetValue(path, value); });
+				[](const INodePtr& node, const auto& name) { return node->GetChild(name); },
+				[&value](const INodePtr& node, const auto& path) { return node->GrowBranchAndSetValue(path, value); });
 	}
 
 	std::pair<INodePtr, utility::TraceLocker<INode>> BaseImpl::LockPath(const std::string& path_) const

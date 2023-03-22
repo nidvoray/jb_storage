@@ -5,7 +5,6 @@
 #include "Path.h"
 #include "TraceLocker.h"
 
-#include <functional>
 #include <mutex>
 #include <utility>
 
@@ -27,12 +26,12 @@ namespace jb_storage
 
 		std::pair<INodePtr, utility::TraceLocker<INode>> LockPath(const std::string& path) const;
 
-		template < typename NodePointerType, typename LockAdaptor = typename NodePointerType::element_type >
+		template < typename NodePointerType, typename LockAdaptor = typename NodePointerType::element_type, typename ChildGetter, typename ValueSetter >
 		static bool GrowBranchAndSetValue(
 				const NodePointerType& root,
 				const std::string& path_,
-				const std::function<NodePointerType (const NodePointerType&, const std::string& name)>& child_getter,
-				const std::function<bool (const NodePointerType&, const utility::Path& path)>& value_setter)
+				ChildGetter&& child_getter,
+				ValueSetter&& value_setter)
 		{
 			const utility::Path path{ path_ };
 			utility::TraceLocker<LockAdaptor> locker{ path.GetDepth() };
