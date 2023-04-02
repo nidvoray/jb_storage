@@ -3,6 +3,7 @@
 #include "Mutex.h"
 #include "VolumeImpl.h"
 
+#include <iostream>
 #include <map>
 
 namespace jb_storage
@@ -197,10 +198,13 @@ namespace jb_storage
 		~MountTokenImpl()
 		{
 			if (const auto owner{ _owner.lock() })
+			try
 			{
 				std::unique_lock lock{ static_cast<VirtualNodeNonPolymorphicLockMixin&>(*owner) };
 				owner->Unmount(_holder);
 			}
+			catch (const std::system_error& e)
+			{ std::cerr << "this could never happen but std::system_error with code " << e.code() << " meaning " << e.what() << " has been caught\n"; }
 		}
 	};
 
