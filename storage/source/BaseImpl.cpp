@@ -3,13 +3,13 @@
 namespace jb_storage
 {
 
-	std::optional<Value> BaseImpl::Get(const std::string& path) const
+	std::optional<Value> BaseImpl::Get(const std::string_view path) const
 	{
 		const auto [node, locker] { LockPath(path) };
 		return node ? node->GetValue() : std::nullopt;
 	}
 
-	bool BaseImpl::Delete(const std::string& path_) const
+	bool BaseImpl::Delete(const std::string_view path_) const
 	{
 		const utility::Path path{ path_ };
 		if (!path.GetDepth())
@@ -38,7 +38,7 @@ namespace jb_storage
 		return parent->DeleteChild(key_name);
 	}
 
-	bool BaseImpl::SetOrInsert(const std::string& path, const Value& value) const
+	bool BaseImpl::SetOrInsert(const std::string_view path, const Value& value) const
 	{
 		return GrowBranchAndSetValue(
 				_root,
@@ -47,7 +47,7 @@ namespace jb_storage
 				[&value](const INodePtr& node, const auto& path) { return node->GrowBranchAndSetValue(path, value); });
 	}
 
-	std::pair<INodePtr, utility::TraceLocker<INode>> BaseImpl::LockPath(const std::string& path_) const
+	std::pair<INodePtr, utility::TraceLocker<INode>> BaseImpl::LockPath(const std::string_view path_) const
 	{
 		const utility::Path path{ path_ };
 		utility::TraceLocker<INode> locker{ path.GetDepth() + 1 };

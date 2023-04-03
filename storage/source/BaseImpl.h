@@ -17,19 +17,19 @@ namespace jb_storage
 		INodePtr	_root;
 
 	public:
-		std::optional<Value> Get(const std::string& path) const;
-		bool Delete(const std::string& path) const;
-		bool SetOrInsert(const std::string& path, const Value& value) const;
+		std::optional<Value> Get(const std::string_view path) const;
+		bool Delete(const std::string_view path) const;
+		bool SetOrInsert(const std::string_view path, const Value& value) const;
 
 	protected:
 		explicit BaseImpl(const INodePtr& root) noexcept : _root{ root } { }
 
-		std::pair<INodePtr, utility::TraceLocker<INode>> LockPath(const std::string& path) const;
+		std::pair<INodePtr, utility::TraceLocker<INode>> LockPath(const std::string_view path) const;
 
 		template < typename NodePointerType, typename LockAdaptor = typename NodePointerType::element_type, typename ChildGetter, typename ValueSetter >
 		static bool GrowBranchAndSetValue(
 				const NodePointerType& root,
-				const std::string& path_,
+				const std::string_view path_,
 				ChildGetter&& child_getter,
 				ValueSetter&& value_setter)
 		{
