@@ -245,16 +245,16 @@ namespace jb_storage
 
 	Storage::~Storage() = default;
 
-	std::optional<Value> Storage::Get(const std::string& path) const
+	std::optional<Value> Storage::Get(const std::string_view path) const
 	{ return _impl->Get(path); }
 
-	bool Storage::SetOrInsert(const std::string& path, const Value& value) const
+	bool Storage::SetOrInsert(const std::string_view path, const Value& value) const
 	{ return _impl->SetOrInsert(path, value); }
 
-	bool Storage::Delete(const std::string& path) const
+	bool Storage::Delete(const std::string_view path) const
 	{ return _impl->Delete(path); }
 
-	Storage::MountToken Storage::Mount(const std::string& where, const Volume& volume, const std::string& what) const
+	Storage::MountToken Storage::Mount(const std::string_view where, const Volume& volume, const std::string_view what) const
 	{ return MountToken{ _impl->Mount(where, volume._impl, what) }; }
 
 }

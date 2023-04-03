@@ -9,13 +9,13 @@ namespace jb_storage
 		: _impl{ std::make_shared<VolumeImpl>() }
 	{ }
 
-	std::optional<Value> Volume::Get(const std::string& path) const
+	std::optional<Value> Volume::Get(const std::string_view path) const
 	{ return _impl->Get(path); }
 
-	bool Volume::SetOrInsert(const std::string& path, const Value& value) const
+	bool Volume::SetOrInsert(const std::string_view path, const Value& value) const
 	{ return _impl->SetOrInsert(path, value); }
 
-	bool Volume::Delete(const std::string& path) const
+	bool Volume::Delete(const std::string_view path) const
 	{ return _impl->Delete(path); }
 
 	bool Volume::Load(std::istream& is) const

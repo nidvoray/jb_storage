@@ -34,11 +34,11 @@ namespace jb_storage
 		Storage();
 		~Storage();
 
-		std::optional<Value> Get(const std::string& path) const override;
-		bool SetOrInsert(const std::string& path, const Value& value) const override;
-		bool Delete(const std::string& path) const override;
+		std::optional<Value> Get(const std::string_view path) const override;
+		bool SetOrInsert(const std::string_view path, const Value& value) const override;
+		bool Delete(const std::string_view path) const override;
 
-		MountToken Mount(const std::string& where, const Volume& volume, const std::string& what) const;
+		MountToken Mount(const std::string_view where, const Volume& volume, const std::string_view what) const;
 	};
 
 }
