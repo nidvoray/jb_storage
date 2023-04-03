@@ -2,7 +2,7 @@
 #define STORAGE_PATH_H
 
 #include <regex>
-#include <string>
+#include <string_view>
 
 namespace jb_storage::utility
 {
@@ -10,16 +10,15 @@ namespace jb_storage::utility
 	class Path final
 	{
 	public:
-		using const_iterator = std::sregex_token_iterator;
+		using const_iterator = std::cregex_token_iterator;
 
 	private:
-		const std::string&	_path;
 		const_iterator		_begin;
 		const_iterator		_end;
 		size_t				_depth;
 
 	public:
-		explicit Path(const std::string& path);
+		explicit Path(const std::string_view path);
 
 		size_t GetDepth() const noexcept 				{ return _depth; }
 		bool IsEmpty() const noexcept 					{ return GetDepth() == 0; }
