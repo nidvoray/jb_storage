@@ -178,7 +178,7 @@ namespace jb_storage
 	public:
 		Impl() : Impl{ std::make_shared<VirtualNode>() } { };
 
-		MountTokenImplPtr Mount(const std::string& where, const VolumeImplPtr& volume, const std::string& what) const;
+		MountTokenImplPtr Mount(const std::string_view where, const VolumeImplPtr& volume, const std::string_view what) const;
 
 	private:
 		Impl(const VirtualNodePtr& root) noexcept : BaseImpl{ root }, _root{ root } { }
@@ -208,7 +208,7 @@ namespace jb_storage
 		}
 	};
 
-	Storage::Impl::MountTokenImplPtr Storage::Impl::Mount(const std::string& where, const VolumeImplPtr& volume, const std::string& what) const
+	Storage::Impl::MountTokenImplPtr Storage::Impl::Mount(const std::string_view where, const VolumeImplPtr& volume, const std::string_view what) const
 	{
 		if (const auto [volume_node, locker] { volume->LockPath(what) }; volume_node)
 		{
