@@ -55,8 +55,8 @@ namespace jb_storage
 			using NonPolymorphicBase = VirtualNodeNonPolymorphicLockMixin;
 
 		private:
-			std::vector<MountHolderPtr>				_mounted;
-			std::map<std::string, VirtualNodePtr>	_virtual_children;
+			std::vector<MountHolderPtr>							_mounted;
+			std::map<std::string, VirtualNodePtr, std::less<>>	_virtual_children;
 
 		public:
 			std::optional<Value> GetValue() const override
@@ -75,7 +75,7 @@ namespace jb_storage
 				return false;
 			}
 
-			INodePtr GetChild(const std::string& name) const override
+			INodePtr GetChild(const std::string_view name) const override
 			{
 				for (auto rmounted{ _mounted.rbegin() }, rend{ _mounted.rend() }; rmounted != rend; ++rmounted)
 					if (const auto child{ (*rmounted)->GetNode()->GetChild(name) })
@@ -84,13 +84,20 @@ namespace jb_storage
 				return GetVirtualChild(name);
 			}
 
-			bool DeleteChild(const std::string& name) override
+			bool DeleteChild(const std::string_view name) override
 			{
 				for (auto rmounted{ _mounted.rbegin() }, rend{ _mounted.rend() }; rmounted != rend; ++rmounted)
 					if ((*rmounted)->GetNode()->DeleteChild(name))
 						return true;
 
-				return _virtual_children.erase(name) != 0;
+				// std::map::erase with equivalent key comparison appears in c++23 only
+				if (const auto child{ _virtual_children.find(name) }; child != _virtual_children.end())
+				{
+					_virtual_children.erase(child);
+					return true;
+				}
+
+				return false;
 			}
 
 			void lock() override
@@ -124,11 +131,11 @@ namespace jb_storage
 					auto key{ path.begin() };
 
 					const auto new_subbranch{ std::make_shared<VirtualNode>() };
-					const auto new_subbranch_name{ *key++ };
+					const std::string new_subbranch_name{ *key++ };
 
 					auto tail{ new_subbranch };
 					for (const auto end{ path.end() }; key != end; ++key)
-						tail = tail->SetVirtualChild(*key, std::make_shared<VirtualNode>());
+						tail = tail->SetVirtualChild(key->str(), std::make_shared<VirtualNode>());
 
 					tail->Mount(holder);
 
@@ -142,7 +149,7 @@ namespace jb_storage
 				return nullptr; //avoid using shared_from_this() here
 			}
 
-			VirtualNodePtr GetVirtualChild(const std::string& name) const
+			VirtualNodePtr GetVirtualChild(const std::string_view name) const
 			{
 				const auto child{ _virtual_children.find(name) };
 				return child != _virtual_children.end() ? child->second : nullptr;
@@ -156,9 +163,9 @@ namespace jb_storage
 			}
 
 		private:
-			VirtualNodePtr SetVirtualChild(const std::string& name, const VirtualNodePtr& child)
+			VirtualNodePtr SetVirtualChild(const std::string_view name, const VirtualNodePtr& child)
 			{
-				_virtual_children.insert_or_assign(name, child);
+				_virtual_children.insert_or_assign(std::string{ name }, child);
 				return child;
 			}
 
@@ -218,7 +225,7 @@ namespace jb_storage
 			GrowBranchAndSetValue<VirtualNodePtr, VirtualNodeNonPolymorphicLockMixin>(
 					_root,
 					where,
-					[](const VirtualNodePtr& storage_node, const auto& name) { return storage_node->GetVirtualChild(name); },
+					[](const VirtualNodePtr& storage_node, const std::string_view name) { return storage_node->GetVirtualChild(name); },
 					[&holder, &owner](const VirtualNodePtr& storage_node, const auto& path)
 					{
 						const auto retval{ storage_node->GrowBranchAndMount(path, holder) };

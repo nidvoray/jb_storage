@@ -23,8 +23,8 @@ namespace jb_storage
 		virtual std::optional<Value> GetValue() const = 0;
 		virtual bool GrowBranchAndSetValue(const utility::Path& path, const Value& value) = 0;
 
-		virtual INodePtr GetChild(const std::string& name) const = 0;
-		virtual bool DeleteChild(const std::string& name) = 0;
+		virtual INodePtr GetChild(const std::string_view name) const = 0;
+		virtual bool DeleteChild(const std::string_view name) = 0;
 
 		virtual void lock() = 0;
 		virtual void unlock() = 0;

@@ -11,9 +11,9 @@ namespace jb_storage
 	class VolumeImpl::Node final : public INode
 	{
 	private:
-		Value							_value;
-		std::map<std::string, NodePtr>	_children;
-		MutexType						_lock;
+		Value										_value;
+		std::map<std::string, NodePtr, std::less<>>	_children;
+		MutexType									_lock;
 
 	public:
 		std::optional<Value> GetValue() const override
@@ -26,11 +26,11 @@ namespace jb_storage
 				auto key{ path.begin() };
 
 				const auto new_subbranch{ std::make_shared<Node>() };
-				const auto new_subbranch_name{ *key++ };
+				const std::string new_subbranch_name{ *key++ };
 
 				auto tail{ new_subbranch };
 				for (const auto end{ path.end() }; key != end; ++key)
-					tail = tail->SetChild(*key, std::make_shared<Node>());
+					tail = tail->SetChild(key->str(), std::make_shared<Node>());
 
 				tail->_value = value;
 
@@ -42,14 +42,23 @@ namespace jb_storage
 			return true;
 		}
 
-		INodePtr GetChild(const std::string& name) const override
+		INodePtr GetChild(const std::string_view name) const override
 		{
 			const auto child{ _children.find(name) };
 			return child != _children.end() ? child->second : nullptr;
 		}
 
-		bool DeleteChild(const std::string& name) override
-		{ return _children.erase(name) != 0; }
+		bool DeleteChild(const std::string_view name) override
+		{
+			// std::map::erase with equivalent key comparison appears in c++23 only
+			if (const auto child{ _children.find(name) }; child != _children.end())
+			{
+				_children.erase(child);
+				return true;
+			}
+
+			return false;
+		}
 
 		void lock() override
 		{ _lock.lock(); }
@@ -99,9 +108,9 @@ namespace jb_storage
 		}
 
 	private:
-		NodePtr SetChild(const std::string& name, const NodePtr& child)
+		NodePtr SetChild(const std::string_view name, const NodePtr& child)
 		{
-			_children.insert_or_assign(name, child);
+			_children.insert_or_assign(std::string{ name }, child);
 			return child;
 		}
 	};

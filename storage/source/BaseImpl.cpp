@@ -43,7 +43,7 @@ namespace jb_storage
 		return GrowBranchAndSetValue(
 				_root,
 				path,
-				[](const INodePtr& node, const auto& name) { return node->GetChild(name); },
+				[](const INodePtr& node, const std::string_view name) { return node->GetChild(name); },
 				[&value](const INodePtr& node, const auto& path) { return node->GrowBranchAndSetValue(path, value); });
 	}
 
@@ -56,7 +56,7 @@ namespace jb_storage
 		for (auto key{ path.begin() }, end{ path.end() }; key != end && current; ++key)
 		{
 			locker.Push(*current);
-			current = current->GetChild(*key);
+			current = current->GetChild(key->str());
 		}
 
 		if (current)
