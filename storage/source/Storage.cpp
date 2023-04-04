@@ -130,16 +130,17 @@ namespace jb_storage
 				{
 					auto key{ path.begin() };
 
-					const auto new_subbranch{ std::make_shared<VirtualNode>() };
+					auto new_subbranch{ std::make_shared<VirtualNode>() };
+					auto tail{ new_subbranch };
+
 					const auto new_subbranch_name{ *key++ };
 
-					auto tail{ new_subbranch };
 					for (const auto end{ path.end() }; key != end; ++key)
 						tail = tail->SetVirtualChild(*key, std::make_shared<VirtualNode>());
 
 					tail->Mount(holder);
 
-					SetVirtualChild(new_subbranch_name, new_subbranch);
+					SetVirtualChild(new_subbranch_name, std::move(new_subbranch));
 
 					return tail;
 				}
@@ -163,11 +164,8 @@ namespace jb_storage
 			}
 
 		private:
-			VirtualNodePtr SetVirtualChild(const std::string_view name, const VirtualNodePtr& child)
-			{
-				_virtual_children.insert_or_assign(std::string{ name }, child);
-				return child;
-			}
+			VirtualNodePtr SetVirtualChild(const std::string_view name, VirtualNodePtr&& child)
+			{ return _virtual_children.insert_or_assign(std::string{ name }, std::move(child)).first->second; }
 
 			void Mount(const MountHolderPtr& holder)
 			{ _mounted.push_back(holder); }

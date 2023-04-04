@@ -25,16 +25,17 @@ namespace jb_storage
 			{
 				auto key{ path.begin() };
 
-				const auto new_subbranch{ std::make_shared<Node>() };
+				auto new_subbranch{ std::make_shared<Node>() };
+				auto tail{ new_subbranch };
+
 				const auto new_subbranch_name{ *key++ };
 
-				auto tail{ new_subbranch };
 				for (const auto end{ path.end() }; key != end; ++key)
 					tail = tail->SetChild(*key, std::make_shared<Node>());
 
 				tail->_value = value;
 
-				SetChild(new_subbranch_name, new_subbranch);
+				SetChild(new_subbranch_name, std::move(new_subbranch));
 			}
 			else
 				_value = value;
@@ -99,20 +100,17 @@ namespace jb_storage
 			for (uint64_t i{ 0 }; i < count; ++i)
 			{
 				const auto name{ utility::Deserialize<std::string>(is) };
-				const auto child{ std::make_shared<Node>() };
+				auto child{ std::make_shared<Node>() };
 				child->Deserialize(is);
-				node.SetChild(name, child);
+				node.SetChild(name, std::move(child));
 			}
 
 			swap(node);
 		}
 
 	private:
-		NodePtr SetChild(const std::string_view name, const NodePtr& child)
-		{
-			_children.insert_or_assign(std::string{ name }, child);
-			return child;
-		}
+		NodePtr SetChild(const std::string_view name, NodePtr&& child)
+		{ return _children.insert_or_assign(std::string{ name }, std::move(child)).first->second; }
 	};
 
 	VolumeImpl::VolumeImpl()
