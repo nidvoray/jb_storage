@@ -186,7 +186,7 @@ namespace jb_storage
 		MountTokenImplPtr Mount(const std::string_view where, const VolumeImplPtr& volume, const std::string_view what) const;
 
 	private:
-		Impl(const VirtualNodePtr& root) noexcept : BaseImpl{ root }, _root{ root } { }
+		Impl(VirtualNodePtr&& root) noexcept : BaseImpl{ root }, _root{ std::move(root) } { }
 	};
 
 	class Storage::MountTokenImpl final
@@ -240,8 +240,8 @@ namespace jb_storage
 	Storage::MountToken::operator bool () const noexcept
 	{ return !!_impl; }
 
-	Storage::MountToken::MountToken(const MountTokenImplPtr& impl) noexcept
-		: _impl{ impl }
+	Storage::MountToken::MountToken(MountTokenImplPtr&& impl) noexcept
+		: _impl{ std::move(impl) }
 	{ }
 
 	Storage::Storage()

@@ -24,7 +24,7 @@ namespace jb_storage
 			explicit operator bool () const noexcept;
 
 		private:
-			explicit MountToken(const MountTokenImplPtr& impl) noexcept;
+			explicit MountToken(MountTokenImplPtr&& impl) noexcept;
 		};
 
 	private:

@@ -31,7 +31,7 @@ namespace jb_storage
 		bool Save(std::ostream& os) const;
 
 	private:
-		explicit VolumeImpl(const NodePtr& root) noexcept;
+		explicit VolumeImpl(NodePtr&& root) noexcept;
 
 		bool IsUsed() const noexcept;
 	};
