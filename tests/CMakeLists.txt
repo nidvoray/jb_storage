@@ -11,7 +11,7 @@ add_subdirectory(thirdparty/googletest)
 add_compile_definitions(USE_STDCXX_MUTEX)
 
 add_executable(storage-tests
-	PathTest.cpp
+	PathViewTest.cpp
 	TraceLockerTest.cpp
 	SerializationTest.cpp
 	VolumeTest.cpp

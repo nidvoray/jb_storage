@@ -9,7 +9,7 @@ add_compile_definitions(USE_STDCXX_MUTEX)
 
 add_library(storage
 	source/BaseImpl.cpp
-	source/Path.cpp
+	source/PathView.cpp
 	source/Serialization.cpp
 	source/Storage.cpp
 	source/Volume.cpp

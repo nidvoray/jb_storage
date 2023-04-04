@@ -19,7 +19,7 @@ namespace jb_storage
 		std::optional<Value> GetValue() const override
 		{ return _value; }
 
-		bool GrowBranchAndSetValue(const utility::Path& path, const Value& value) override
+		bool GrowBranchAndSetValue(const utility::PathView& path, const Value& value) override
 		{
 			if (!path.IsEmpty())
 			{

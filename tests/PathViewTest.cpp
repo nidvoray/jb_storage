@@ -1,4 +1,4 @@
-#include "Path.h"
+#include "PathView.h"
 
 #include <gtest/gtest.h>
 
@@ -13,43 +13,43 @@ namespace
 
 }
 
-TEST(PathTest, Valid)
-{ ASSERT_NO_THROW(utility::Path{ source }); }
+TEST(PathViewTest, Valid)
+{ ASSERT_NO_THROW(utility::PathView{ source }); }
 
-TEST(PathTest, Relative)
-{ ASSERT_THROW(utility::Path{ "foo" }, std::invalid_argument); }
+TEST(PathViewTest, Relative)
+{ ASSERT_THROW(utility::PathView{ "foo" }, std::invalid_argument); }
 
-TEST(PathTest, Iterators)
+TEST(PathViewTest, Iterators)
 {
 	const std::vector<std::string> expected{ "foo", "bar", "baz", "etc" };
 
 	{
 		std::vector<std::string> result;
-		const utility::Path path{ source };
+		const utility::PathView path{ source };
 		std::transform(path.begin(), path.end(), std::back_inserter(result), view2str);
 		ASSERT_EQ(expected, result);
 	}
 
 	{
 		std::vector<std::string> result;
-		for (const auto& key : utility::Path{ source })
+		for (const auto& key : utility::PathView{ source })
 			result.emplace_back(key);
 		ASSERT_EQ(expected, result);
 	}
 }
 
-TEST(PathTest, Depth)
-{ ASSERT_EQ(utility::Path{ source }.GetDepth(), 4); }
+TEST(PathViewTest, Depth)
+{ ASSERT_EQ(utility::PathView{ source }.GetDepth(), 4); }
 
-TEST(PathTest, Emptiness)
+TEST(PathViewTest, Emptiness)
 {
 	const std::string source{ "/" };
-	ASSERT_TRUE(utility::Path{ source }.IsEmpty());
+	ASSERT_TRUE(utility::PathView{ source }.IsEmpty());
 }
 
-TEST(PathTest, IteratorArithmetic)
+TEST(PathViewTest, IteratorArithmetic)
 {
-	const utility::Path path{ source };
+	const utility::PathView path{ source };
 	auto it{ path.begin() };
 
 	ASSERT_EQ((it++)->at(1), 'o'); // fOo
@@ -57,9 +57,9 @@ TEST(PathTest, IteratorArithmetic)
 	ASSERT_EQ((++it)->front(), 'b'); // Baz
 }
 
-TEST(PathTest, Rest)
+TEST(PathViewTest, Rest)
 {
-	const utility::Path path{ source };
+	const utility::PathView path{ source };
 	const auto tail{ path.GetRest(std::next(path.begin(), 2)) };
 
 	ASSERT_EQ(tail.GetDepth(), 2);
@@ -71,13 +71,13 @@ TEST(PathTest, Rest)
 	ASSERT_EQ(expected, result);
 }
 
-TEST(PathTest, International)
+TEST(PathViewTest, International)
 {
 	const std::string source{ "/фу./бар#/баз?/итд*/" };
 	const std::vector<std::string> expected{ "фу.", "бар#", "баз?", "итд*" };
 
 	std::vector<std::string> result;
-	const utility::Path path{ source };
+	const utility::PathView path{ source };
 	std::transform(path.begin(), path.end(), std::back_inserter(result), view2str);
 	ASSERT_EQ(expected, result);
 }

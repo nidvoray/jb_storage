@@ -11,7 +11,7 @@ namespace jb_storage
 
 	bool BaseImpl::Delete(const std::string_view path_) const
 	{
-		const utility::Path path{ path_ };
+		const utility::PathView path{ path_ };
 		if (!path.GetDepth())
 			return false;
 
@@ -49,7 +49,7 @@ namespace jb_storage
 
 	std::pair<INodePtr, utility::TraceLocker<INode>> BaseImpl::LockPath(const std::string_view path_) const
 	{
-		const utility::Path path{ path_ };
+		const utility::PathView path{ path_ };
 		utility::TraceLocker<INode> locker{ path.GetDepth() + 1 };
 
 		auto current{ _root };

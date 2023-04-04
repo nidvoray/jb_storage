@@ -67,7 +67,7 @@ namespace jb_storage
 				return std::nullopt;
 			}
 
-			bool GrowBranchAndSetValue(const utility::Path& path, const Value& value) override
+			bool GrowBranchAndSetValue(const utility::PathView& path, const Value& value) override
 			{
 				if (!_mounted.empty())
 					return _mounted.back()->GetNode()->GrowBranchAndSetValue(path, value);
@@ -124,7 +124,7 @@ namespace jb_storage
 				NonPolymorphicBase::unlock_shared();
 			}
 
-			VirtualNodePtr GrowBranchAndMount(const utility::Path& path, const MountHolderPtr& holder)
+			VirtualNodePtr GrowBranchAndMount(const utility::PathView& path, const MountHolderPtr& holder)
 			{
 				if (!path.IsEmpty())
 				{

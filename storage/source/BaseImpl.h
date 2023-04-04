@@ -2,7 +2,7 @@
 #define STORAGE_BASEIMPL_H
 
 #include "INode.h"
-#include "Path.h"
+#include "PathView.h"
 #include "TraceLocker.h"
 
 #include <mutex>
@@ -33,7 +33,7 @@ namespace jb_storage
 				ChildGetter&& child_getter,
 				ValueSetter&& value_setter)
 		{
-			const utility::Path path{ path_ };
+			const utility::PathView path{ path_ };
 			utility::TraceLocker<LockAdaptor> locker{ path.GetDepth() };
 
 			auto current{ root };
