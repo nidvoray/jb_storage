@@ -47,7 +47,7 @@ namespace jb_storage
 					for (; key != end; ++key)
 					{
 						locker.Push(*current);
-						if (const auto child{ child_getter(current, key->str()) })
+						if (const auto child{ child_getter(current, *key) })
 							current = child;
 						else
 							break;
@@ -58,7 +58,7 @@ namespace jb_storage
 
 				std::unique_lock lock{ static_cast<LockAdaptor&>(*current) };
 
-				if (key != end && child_getter(current, key->str()))
+				if (key != end && child_getter(current, *key))
 					continue;
 
 				return value_setter(current, path.GetRest(key));

@@ -131,11 +131,11 @@ namespace jb_storage
 					auto key{ path.begin() };
 
 					const auto new_subbranch{ std::make_shared<VirtualNode>() };
-					const std::string new_subbranch_name{ *key++ };
+					const auto new_subbranch_name{ *key++ };
 
 					auto tail{ new_subbranch };
 					for (const auto end{ path.end() }; key != end; ++key)
-						tail = tail->SetVirtualChild(key->str(), std::make_shared<VirtualNode>());
+						tail = tail->SetVirtualChild(*key, std::make_shared<VirtualNode>());
 
 					tail->Mount(holder);
 

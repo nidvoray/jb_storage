@@ -19,7 +19,7 @@ namespace jb_storage
 
 		INodePtr parent;
 		auto current{ _root };
-		std::string key_name;
+		std::string_view key_name;
 
 		for (auto key{ path.begin() }, end{ path.end() }; key != end && current; ++key)
 		{
@@ -56,7 +56,7 @@ namespace jb_storage
 		for (auto key{ path.begin() }, end{ path.end() }; key != end && current; ++key)
 		{
 			locker.Push(*current);
-			current = current->GetChild(key->str());
+			current = current->GetChild(*key);
 		}
 
 		if (current)
