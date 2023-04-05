@@ -5,7 +5,7 @@ project(storage-tests)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(gtest_force_shared_crt on)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 add_subdirectory(thirdparty/googletest)
 
 add_compile_definitions(USE_STDCXX_MUTEX)
