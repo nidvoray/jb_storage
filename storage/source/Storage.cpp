@@ -16,16 +16,16 @@ namespace jb_storage
 		{
 		private:
 			INodePtr					_node;
-			std::weak_ptr<VolumeImpl>	_volume;
+			std::weak_ptr<VolumeImpl>	_volumeWeak;
 
 		public:
 			MountHolder(const INodePtr& node, const VolumeImplPtr& volume) noexcept
-				: _node{ node }, _volume{ volume }
+				: _node{ node }, _volumeWeak{ volume }
 			{ volume->AddRef(); }
 
 			~MountHolder()
 			{
-				if (const auto volume{ _volume.lock() })
+				if (const auto volume{ _volumeWeak.lock() })
 					volume->Release();
 			}
 
@@ -49,6 +49,7 @@ namespace jb_storage
 		};
 
 		using VirtualNodePtr = std::shared_ptr<class VirtualNode>;
+		using VirtualNodeWeakPtr = std::weak_ptr<class VirtualNode>;
 
 		class VirtualNode final : public INode, public VirtualNodeNonPolymorphicLockMixin
 		{
@@ -124,7 +125,7 @@ namespace jb_storage
 				NonPolymorphicBase::unlock_shared();
 			}
 
-			VirtualNodePtr GrowBranchAndMount(const utility::PathView& path, const MountHolderPtr& holder)
+			VirtualNodePtr GrowBranchAndMount(const utility::PathView& path, MountHolderPtr&& holder)
 			{
 				if (!path.IsEmpty())
 				{
@@ -138,14 +139,14 @@ namespace jb_storage
 					for (const auto end{ path.end() }; key != end; ++key)
 						tail = tail->SetVirtualChild(*key, std::make_shared<VirtualNode>());
 
-					tail->Mount(holder);
+					tail->Mount(std::move(holder));
 
 					SetVirtualChild(new_subbranch_name, std::move(new_subbranch));
 
 					return tail;
 				}
 				else
-					Mount(holder);
+					Mount(std::move(holder));
 
 				return nullptr; //avoid using shared_from_this() here
 			}
@@ -167,8 +168,8 @@ namespace jb_storage
 			VirtualNodePtr SetVirtualChild(const std::string_view name, VirtualNodePtr&& child)
 			{ return _virtual_children.insert_or_assign(std::string{ name }, std::move(child)).first->second; }
 
-			void Mount(const MountHolderPtr& holder)
-			{ _mounted.push_back(holder); }
+			void Mount(MountHolderPtr&& holder)
+			{ _mounted.push_back(std::move(holder)); }
 		};
 
 	}
@@ -192,21 +193,21 @@ namespace jb_storage
 	class Storage::MountTokenImpl final
 	{
 	private:
-		std::weak_ptr<VirtualNode>	_owner;
-		MountHolderWeakPtr			_holder;
+		VirtualNodeWeakPtr	_ownerWeak;
+		MountHolderWeakPtr	_holderWeak;
 
 	public:
-		MountTokenImpl(const VirtualNodePtr& owner, const MountHolderPtr& holder) noexcept
-			: _owner{ owner }, _holder{ holder }
+		MountTokenImpl(VirtualNodeWeakPtr&& ownerWeak, MountHolderWeakPtr&& holderWeak) noexcept
+			: _ownerWeak{ std::move(ownerWeak) }, _holderWeak{ std::move(holderWeak) }
 		{ }
 
 		~MountTokenImpl()
 		{
-			if (const auto owner{ _owner.lock() })
+			if (const auto owner{ _ownerWeak.lock() })
 			try
 			{
 				std::unique_lock lock{ static_cast<VirtualNodeNonPolymorphicLockMixin&>(*owner) };
-				owner->Unmount(_holder);
+				owner->Unmount(_holderWeak);
 			}
 			catch (const std::system_error& e)
 			{ std::cerr << "this could never happen but std::system_error with code " << e.code() << " meaning " << e.what() << " has been caught\n"; }
@@ -217,21 +218,22 @@ namespace jb_storage
 	{
 		if (const auto [volume_node, locker] { volume->LockPath(what) }; volume_node)
 		{
-			const auto holder{ std::make_shared<MountHolder>(volume_node, volume) };
-			VirtualNodePtr owner;
+			MountHolderPtr holder{ std::make_shared<MountHolder>(volume_node, volume) };
+			MountHolderWeakPtr holderWeak{ holder };
+			VirtualNodeWeakPtr ownerWeak;
 
 			GrowBranchAndSetValue<VirtualNodePtr, VirtualNodeNonPolymorphicLockMixin>(
 					_root,
 					where,
 					[](const VirtualNodePtr& storage_node, const std::string_view name) { return storage_node->GetVirtualChild(name); },
-					[&holder, &owner](const VirtualNodePtr& storage_node, const auto& path)
+					[&holder, &ownerWeak](const VirtualNodePtr& storage_node, const auto& path)
 					{
-						const auto retval{ storage_node->GrowBranchAndMount(path, holder) };
-						owner = retval ? retval : storage_node; //workaround for returning shared_from_this() from GrowBranchAndMount()
+						const auto retval{ storage_node->GrowBranchAndMount(path, std::move(holder)) };
+						ownerWeak = retval ? retval : storage_node; //workaround for returning shared_from_this() from GrowBranchAndMount()
 						return true;
 					});
 
-			return std::make_shared<MountTokenImpl>(owner, holder);
+			return std::make_shared<MountTokenImpl>(std::move(ownerWeak), std::move(holderWeak));
 		}
 
 		return nullptr;
