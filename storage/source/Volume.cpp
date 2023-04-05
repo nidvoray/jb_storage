@@ -13,7 +13,10 @@ namespace jb_storage
 	{ return _impl->Get(path); }
 
 	bool Volume::SetOrInsert(const std::string_view path, const Value& value) const
-	{ return _impl->SetOrInsert(path, value); }
+	{ return _impl->SetOrInsert(path, Value{ value }); }
+
+	bool Volume::SetOrInsert(const std::string_view path, Value&& value) const
+	{ return _impl->SetOrInsert(path, std::move(value)); }
 
 	bool Volume::Delete(const std::string_view path) const
 	{ return _impl->Delete(path); }

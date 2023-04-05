@@ -19,7 +19,7 @@ namespace jb_storage
 		std::optional<Value> GetValue() const override
 		{ return _value; }
 
-		bool GrowBranchAndSetValue(const utility::PathView& path, const Value& value) override
+		bool GrowBranchAndSetValue(const utility::PathView& path, Value&& value) override
 		{
 			if (!path.IsEmpty())
 			{
@@ -33,12 +33,12 @@ namespace jb_storage
 				for (const auto end{ path.end() }; key != end; ++key)
 					tail = tail->SetChild(*key, std::make_shared<Node>());
 
-				tail->_value = value;
+				tail->_value = std::move(value);
 
 				SetChild(new_subbranch_name, std::move(new_subbranch));
 			}
 			else
-				_value = value;
+				_value = std::move(value);
 
 			return true;
 		}

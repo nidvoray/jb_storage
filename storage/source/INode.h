@@ -21,7 +21,7 @@ namespace jb_storage
 		INode& operator = (const INode&) = delete;
 
 		virtual std::optional<Value> GetValue() const = 0;
-		virtual bool GrowBranchAndSetValue(const utility::PathView& path, const Value& value) = 0;
+		virtual bool GrowBranchAndSetValue(const utility::PathView& path, Value&& value) = 0;
 
 		virtual INodePtr GetChild(const std::string_view name) const = 0;
 		virtual bool DeleteChild(const std::string_view name) = 0;

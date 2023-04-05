@@ -19,7 +19,7 @@ namespace jb_storage
 	public:
 		std::optional<Value> Get(const std::string_view path) const;
 		bool Delete(const std::string_view path) const;
-		bool SetOrInsert(const std::string_view path, const Value& value) const;
+		bool SetOrInsert(const std::string_view path, Value&& value) const;
 
 	protected:
 		explicit BaseImpl(const INodePtr& root) noexcept : _root{ root } { }

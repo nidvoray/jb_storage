@@ -24,6 +24,7 @@ namespace jb_storage
 
 		std::optional<Value> Get(const std::string_view path) const override;
 		bool SetOrInsert(const std::string_view path, const Value& value) const override;
+		bool SetOrInsert(const std::string_view path, Value&& value) const override;
 		bool Delete(const std::string_view path) const override;
 
 		bool Load(std::istream& is) const;

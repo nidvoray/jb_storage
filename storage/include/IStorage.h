@@ -22,6 +22,7 @@ namespace jb_storage
 
 		virtual std::optional<Value> Get(const std::string_view path) const = 0;
 		virtual bool SetOrInsert(const std::string_view path, const Value& value) const = 0;
+		virtual bool SetOrInsert(const std::string_view path, Value&& value) const = 0;
 		virtual bool Delete(const std::string_view path) const = 0;
 	};
 

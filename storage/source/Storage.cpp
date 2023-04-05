@@ -67,10 +67,10 @@ namespace jb_storage
 				return std::nullopt;
 			}
 
-			bool GrowBranchAndSetValue(const utility::PathView& path, const Value& value) override
+			bool GrowBranchAndSetValue(const utility::PathView& path, Value&& value) override
 			{
 				if (!_mounted.empty())
-					return _mounted.back()->GetNode()->GrowBranchAndSetValue(path, value);
+					return _mounted.back()->GetNode()->GrowBranchAndSetValue(path, std::move(value));
 
 				return false;
 			}
@@ -254,7 +254,10 @@ namespace jb_storage
 	{ return _impl->Get(path); }
 
 	bool Storage::SetOrInsert(const std::string_view path, const Value& value) const
-	{ return _impl->SetOrInsert(path, value); }
+	{ return _impl->SetOrInsert(path, Value{ value }); }
+
+	bool Storage::SetOrInsert(const std::string_view path, Value&& value) const
+	{ return _impl->SetOrInsert(path, std::move(value)); }
 
 	bool Storage::Delete(const std::string_view path) const
 	{ return _impl->Delete(path); }

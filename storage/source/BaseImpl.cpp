@@ -38,13 +38,13 @@ namespace jb_storage
 		return parent->DeleteChild(key_name);
 	}
 
-	bool BaseImpl::SetOrInsert(const std::string_view path, const Value& value) const
+	bool BaseImpl::SetOrInsert(const std::string_view path, Value&& value) const
 	{
 		return GrowBranchAndSetValue(
 				_root,
 				path,
 				[](const INodePtr& node, const std::string_view name) { return node->GetChild(name); },
-				[&value](const INodePtr& node, const auto& path) { return node->GrowBranchAndSetValue(path, value); });
+				[&value](const INodePtr& node, const auto& path) { return node->GrowBranchAndSetValue(path, std::move(value)); });
 	}
 
 	std::pair<INodePtr, utility::TraceLocker<INode>> BaseImpl::LockPath(const std::string_view path_) const
