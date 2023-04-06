@@ -25,7 +25,7 @@ namespace jb_storage
 
 			~MountHolder()
 			{
-				if (const auto volume{ _volumeWeak.lock() })
+				if (const VolumeImplPtr volume{ _volumeWeak.lock() })
 					volume->Release();
 			}
 
@@ -79,7 +79,7 @@ namespace jb_storage
 			INodePtr GetChild(const std::string_view name) const override
 			{
 				for (auto rmounted{ _mounted.rbegin() }, rend{ _mounted.rend() }; rmounted != rend; ++rmounted)
-					if (const auto child{ (*rmounted)->GetNode()->GetChild(name) })
+					if (const INodePtr child{ (*rmounted)->GetNode()->GetChild(name) })
 						return child;
 
 				return GetVirtualChild(name);
@@ -159,7 +159,7 @@ namespace jb_storage
 
 			void Unmount(const MountHolderWeakPtr& holder_weak)
 			{
-				if (const auto holder{ holder_weak.lock() })
+				if (const MountHolderPtr holder{ holder_weak.lock() })
 					if (const auto found{ std::find(_mounted.begin(), _mounted.end(), holder) }; found != _mounted.end())
 						_mounted.erase(found);
 			}
@@ -203,7 +203,7 @@ namespace jb_storage
 
 		~MountTokenImpl()
 		{
-			if (const auto owner{ _ownerWeak.lock() })
+			if (const VirtualNodePtr owner{ _ownerWeak.lock() })
 			try
 			{
 				std::unique_lock lock{ static_cast<VirtualNodeNonPolymorphicLockMixin&>(*owner) };
@@ -226,10 +226,10 @@ namespace jb_storage
 					_root,
 					where,
 					[](const VirtualNodePtr& storage_node, const std::string_view name) { return storage_node->GetVirtualChild(name); },
-					[&holder, &ownerWeak](const VirtualNodePtr& storage_node, const auto& path)
+					[&holder, &ownerWeak](const VirtualNodePtr& storage_node, const utility::PathView& path)
 					{
-						const auto retval{ storage_node->GrowBranchAndMount(path, std::move(holder)) };
-						ownerWeak = retval ? retval : storage_node; //workaround for returning shared_from_this() from GrowBranchAndMount()
+						const VirtualNodePtr owner{ storage_node->GrowBranchAndMount(path, std::move(holder)) };
+						ownerWeak = owner ? owner : storage_node; //workaround for returning shared_from_this() from GrowBranchAndMount()
 						return true;
 					});
 

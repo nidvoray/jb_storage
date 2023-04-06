@@ -36,7 +36,7 @@ namespace jb_storage
 			const utility::PathView path{ path_ };
 			utility::TraceLocker<LockAdaptor> locker{ path.GetDepth() };
 
-			auto current{ root };
+			NodePointerType current{ root };
 			auto key{ path.begin() };
 			const auto end{ path.end() };
 
@@ -47,7 +47,7 @@ namespace jb_storage
 					for (; key != end; ++key)
 					{
 						locker.Push(*current);
-						if (const auto child{ child_getter(current, *key) })
+						if (const NodePointerType child{ child_getter(current, *key) })
 							current = child;
 						else
 							break;

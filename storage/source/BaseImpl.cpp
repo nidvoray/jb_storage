@@ -18,7 +18,7 @@ namespace jb_storage
 		utility::TraceLocker<INode> locker{ path.GetDepth() };
 
 		INodePtr parent;
-		auto current{ _root };
+		INodePtr current{ _root };
 		std::string_view key_name;
 
 		for (auto key{ path.begin() }, end{ path.end() }; key != end && current; ++key)
@@ -44,7 +44,7 @@ namespace jb_storage
 				_root,
 				path,
 				[](const INodePtr& node, const std::string_view name) { return node->GetChild(name); },
-				[&value](const INodePtr& node, const auto& path) { return node->GrowBranchAndSetValue(path, std::move(value)); });
+				[&value](const INodePtr& node, const utility::PathView& path) { return node->GrowBranchAndSetValue(path, std::move(value)); });
 	}
 
 	std::pair<INodePtr, utility::TraceLocker<INode>> BaseImpl::LockPath(const std::string_view path_) const
@@ -52,7 +52,7 @@ namespace jb_storage
 		const utility::PathView path{ path_ };
 		utility::TraceLocker<INode> locker{ path.GetDepth() + 1 };
 
-		auto current{ _root };
+		INodePtr current{ _root };
 		for (auto key{ path.begin() }, end{ path.end() }; key != end && current; ++key)
 		{
 			locker.Push(*current);
