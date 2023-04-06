@@ -118,10 +118,10 @@ namespace jb_storage
 	{ }
 
 	void VolumeImpl::AddRef() noexcept
-	{ _refcounter.fetch_add(1, std::memory_order_release); }
+	{ _refcounter.fetch_add(1, std::memory_order_acquire); }
 
 	void VolumeImpl::Release() noexcept
-	{ _refcounter.fetch_sub(1, std::memory_order_release); }
+	{ _refcounter.fetch_sub(1, std::memory_order_relaxed); }
 
 	bool VolumeImpl::Load(std::istream& is) const
 	{
@@ -180,6 +180,6 @@ namespace jb_storage
 	{ }
 
 	bool VolumeImpl::IsUsed() const noexcept
-	{ return _refcounter.load(std::memory_order_acquire) != 0; }
+	{ return _refcounter.load(std::memory_order_relaxed) != 0; }
 
 }
