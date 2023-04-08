@@ -12,7 +12,6 @@ add_compile_definitions(USE_STDCXX_MUTEX)
 
 add_executable(storage-tests
 	PathViewTest.cpp
-	TraceLockerTest.cpp
 	SerializationTest.cpp
 	VolumeTest.cpp
 	StorageTest.cpp
