@@ -3,9 +3,9 @@
 
 #include "INode.h"
 #include "PathView.h"
-#include "TraceLocker.h"
 
 #include <mutex>
+#include <shared_mutex>
 #include <utility>
 
 namespace jb_storage
@@ -24,7 +24,7 @@ namespace jb_storage
 	protected:
 		explicit BaseImpl(const INodePtr& root) noexcept : _root{ root } { }
 
-		std::pair<INodePtr, utility::TraceLocker<INode>> LockPath(const std::string_view path) const;
+		INodePtr GetNode(const std::string_view path) const;
 
 		template < typename NodePointerType, typename LockAdaptor = typename NodePointerType::element_type, typename ChildGetter, typename ValueSetter >
 		static bool GrowBranchAndSetValue(
@@ -34,7 +34,6 @@ namespace jb_storage
 				ValueSetter&& value_setter)
 		{
 			const utility::PathView path{ path_ };
-			utility::TraceLocker<LockAdaptor> locker{ path.GetDepth() };
 
 			NodePointerType current{ root };
 			auto key{ path.begin() };
@@ -42,18 +41,13 @@ namespace jb_storage
 
 			do
 			{
-				if (key != end)
+				for (; key != end; ++key)
 				{
-					for (; key != end; ++key)
-					{
-						locker.Push(*current);
-						if (const NodePointerType child{ child_getter(current, *key) })
-							current = child;
-						else
-							break;
-					}
-
-					locker.Pop();
+					std::shared_lock lock{ *current };
+					if (const NodePointerType child{ child_getter(current, *key) })
+						current = child;
+					else
+						break;
 				}
 
 				std::unique_lock lock{ static_cast<LockAdaptor&>(*current) };

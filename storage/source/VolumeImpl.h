@@ -22,7 +22,7 @@ namespace jb_storage
 	public:
 		VolumeImpl();
 
-		using BaseImpl::LockPath;
+		using BaseImpl::GetNode;
 
 		void AddRef() noexcept;
 		void Release() noexcept;

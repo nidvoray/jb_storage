@@ -19,9 +19,14 @@ namespace jb_storage
 			std::weak_ptr<VolumeImpl>	_volumeWeak;
 
 		public:
-			MountHolder(const INodePtr& node, const VolumeImplPtr& volume) noexcept
-				: _node{ node }, _volumeWeak{ volume }
-			{ volume->AddRef(); }
+			MountHolder(const std::string_view path, const VolumeImplPtr& volume)
+				: _volumeWeak{ volume }
+			{
+				volume->AddRef();
+				_node = volume->GetNode(path);
+			}
+
+			MountHolder(MountHolder&&) = default;
 
 			~MountHolder()
 			{
@@ -30,6 +35,7 @@ namespace jb_storage
 			}
 
 			 INodePtr GetNode() const noexcept { return _node; }
+
 		};
 
 		using MountHolderPtr = std::shared_ptr<MountHolder>;
@@ -216,19 +222,19 @@ namespace jb_storage
 
 	Storage::Impl::MountTokenImplPtr Storage::Impl::Mount(const std::string_view where, const VolumeImplPtr& volume, const std::string_view what) const
 	{
-		if (const auto [volume_node, locker] { volume->LockPath(what) }; volume_node)
+		if (MountHolder holder{ what, volume }; holder.GetNode())
 		{
-			MountHolderPtr holder{ std::make_shared<MountHolder>(volume_node, volume) };
-			MountHolderWeakPtr holderWeak{ holder };
+			MountHolderPtr holderPtr{ std::make_shared<MountHolder>(std::move(holder)) };
+			MountHolderWeakPtr holderWeak{ holderPtr };
 			VirtualNodeWeakPtr ownerWeak;
 
 			GrowBranchAndSetValue<VirtualNodePtr, VirtualNodeNonPolymorphicLockMixin>(
 					_root,
 					where,
 					[](const VirtualNodePtr& storage_node, const std::string_view name) { return storage_node->GetVirtualChild(name); },
-					[&holder, &ownerWeak](const VirtualNodePtr& storage_node, const utility::PathView& path)
+					[&holderPtr, &ownerWeak](const VirtualNodePtr& storage_node, const utility::PathView& path)
 					{
-						const VirtualNodePtr owner{ storage_node->GrowBranchAndMount(path, std::move(holder)) };
+						const VirtualNodePtr owner{ storage_node->GrowBranchAndMount(path, std::move(holderPtr)) };
 						ownerWeak = owner ? owner : storage_node; //workaround for returning shared_from_this() from GrowBranchAndMount()
 						return true;
 					});
